@@ -1,3 +1,4 @@
+use std::f32::consts::PI;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use zenoh::prelude::sync::*;
@@ -57,13 +58,15 @@ fn check_subscription(
 
 fn apply_velocity(
     mut ev_cmd_vel: EventReader<CmdVelEvent>,
-    mut player_velocity: Query<(&mut Velocity, &Transform), With<RigidBody>>
+    mut player_velocity: Query<(&mut Velocity, &Transform), With<RigidBody>>,
+    mut gizmos: Gizmos
 ) {
     for ev in ev_cmd_vel.read() {
         for (mut vel, transform) in &mut player_velocity {
-            let angle = Vec2::from_angle(transform.rotation.z);
+            let angle = Vec2::from_angle(transform.rotation.to_euler(EulerRot::XYZ).2);
+            gizmos.ray_2d(transform.translation.truncate(), angle * 100.0, Color::GREEN);
             let rotated_new_linear = angle.rotate(Vec2::new(ev.0.linear.x as f32, ev.0.linear.y as f32));
-            info!("Angle: {:?}, rotated_linear: {:?}", angle, rotated_new_linear);
+            gizmos.ray_2d(transform.translation.truncate(), rotated_new_linear * 100.0, Color::RED);
             vel.linvel += rotated_new_linear;
             vel.angvel += ev.0.angular.z as f32;
         }

@@ -21,8 +21,6 @@ fn main() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         title: "Bevy Turtlesim".into(),
-                        resolution: (640.0, 480.0).into(),
-                        resizable: false,
                         ..default()
                     }),
                     ..default()
@@ -40,10 +38,10 @@ fn main() {
 fn setup(mut commands: Commands) {
     let mut camera = Camera2dBundle::default();
 
-    camera.projection.scaling_mode = ScalingMode::AutoMin {
-        min_width: 256.0,
-        min_height: 144.0,
-    };
+    // camera.projection.scaling_mode = ScalingMode::AutoMin {
+    //     min_width: 256.0,
+    //     min_height: 144.0,
+    // };
 
     commands.spawn(camera);
 }
