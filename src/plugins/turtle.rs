@@ -73,6 +73,27 @@ fn apply_velocity(
     }
 }
 
+fn cast_ray_down(
+    rapier_context: Res<RapierContext>,
+    mut gizmos: Gizmos,
+    position: Query<&Transform, With<RigidBody>>,
+) {
+    let ball_transform = position.single();
+
+    let ray_origin = ball_transform.translation.truncate() + Vec2::new(0.0, -30.0);
+    let ray_dir = Vec2::new(0.0, -100.0);
+    let max_toi = 4.0;
+    let solid = true;
+    let filter = QueryFilter::default();
+
+    if let Some((_entity, toi)) =
+        rapier_context.cast_ray(ray_origin, ray_dir, max_toi, solid, filter)
+    {
+        let hit_point = ray_origin + ray_dir * toi;
+        gizmos.line_2d(ray_origin, hit_point, Color::BLUE);
+    }
+}
+
 pub struct TurtlePlugin;
 
 impl Plugin for TurtlePlugin {
@@ -80,6 +101,6 @@ impl Plugin for TurtlePlugin {
         app
             .add_event::<CmdVelEvent>()
             .add_systems(Startup, setup_turtle)
-            .add_systems(Update, (check_subscription, apply_velocity));
+            .add_systems(Update, (check_subscription, apply_velocity, cast_ray_down));
     }
 }
